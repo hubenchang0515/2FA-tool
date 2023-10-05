@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget* parent) noexcept:
     m_user{new QLabel{"", this}},
     m_copy{new QPushButton{"Copy Password", this}},
     m_password{new QLCDNumber{6, this}},
-    m_config{new Config{"2fa.ini", this}},
+    m_config{new Config{QCoreApplication::applicationDirPath() + "/2fa.ini", this}},
     m_configDialog{new ConfigDialog{m_config, this}},
     m_timer{new QTimer{this}}
 {
