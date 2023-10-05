@@ -1,0 +1,6 @@
+[submodule "3rdparty/quirc"]
+	path = 3rdparty/quirc
+	url = git@github.com:dlbeer/quirc.git
+[submodule "3rdparty/opencv"]
+	path = 3rdparty/opencv
+	url = git@github.com:opencv/opencv.git
