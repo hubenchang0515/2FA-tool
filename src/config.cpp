@@ -35,7 +35,7 @@ const QMap<QString, QCryptographicHash::Algorithm> Config::ALGORITHM_MAP =
 
 Config::Config(const QString& filename, QObject* parent) noexcept:
     QObject{parent},
-    m_settings{new QSettings{filename, QSettings::IniFormat}}
+    m_settings{new QSettings{filename, QSettings::IniFormat, this}}
 {
 
 }
