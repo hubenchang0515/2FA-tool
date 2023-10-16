@@ -113,12 +113,20 @@ void MainWindow::refreshAccount() const noexcept
 {
     QListWidgetItem* item = m_accountList->currentItem();
     if (item == nullptr)
+    {
+        m_site->setText("");
+        m_user->setText("");
         return;
+    }
     
     QStringList path = item->text().remove("/").split(":");
     if (path.size() < 2)
+    {
+        m_site->setText("");
+        m_user->setText("");
         return;
-
+    }
+        
     m_site->setText(path[0]);
     m_user->setText(path[1]);
 }
