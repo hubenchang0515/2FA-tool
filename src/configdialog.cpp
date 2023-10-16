@@ -75,6 +75,26 @@ void ConfigDialog::show() noexcept
     QDialog::show();
 }
 
+void ConfigDialog::enableConfig(bool enabled) noexcept
+{
+    m_site->setEnabled(enabled);
+    m_user->setEnabled(enabled);
+    m_secret->setEnabled(enabled);
+    m_digits->setEnabled(enabled);
+    m_period->setEnabled(enabled);
+    m_algorithm->setEnabled(enabled);
+    m_importButton->setEnabled(enabled);
+
+    if (enabled) 
+    {
+        refreshOkButton();
+    }
+    else
+    {
+        m_okButton->setEnabled(false);
+    }
+}
+
 void ConfigDialog::refreshOkButton() noexcept
 {
     m_okButton->setEnabled(!m_site->text().trimmed().isEmpty() &&
@@ -148,8 +168,14 @@ void ConfigDialog::importQrCode() noexcept
     QFileDialog::getOpenFileContent(
         "*", 
         [this](const QString& filename, const QByteArray& data){
+            enableConfig(false);
+            m_importButton->setText(tr("Be Parsing..."));
             if (!filename.isEmpty())
+            {
                 parseQrCode(data);
+            }
+            enableConfig(true);
+            m_importButton->setText(tr("Import By QR-Code"));
         }
     );
 }

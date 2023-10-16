@@ -21,6 +21,7 @@ public:
     ~ConfigDialog() noexcept;
 
     void show() noexcept;
+    void enableConfig(bool enabled) noexcept;
 
 public slots:
     void refreshOkButton() noexcept;
