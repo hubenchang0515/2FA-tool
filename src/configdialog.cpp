@@ -41,7 +41,7 @@ ConfigDialog::ConfigDialog(Config* config, QWidget* parent) noexcept:
     m_formLayout->addRow(m_okButton);
     setLayout(m_formLayout);
 
-    m_algorithm->addItems({"SHA1", "SHA256", "SHA512"});
+    m_algorithm->addItems(Config::ALGORITHM_LIST);
 
     m_secret->setEchoMode(QLineEdit::PasswordEchoOnEdit);
     m_digits->setValidator(new QIntValidator{6, 8, this});
@@ -82,14 +82,12 @@ void ConfigDialog::refreshOkButton() noexcept
                             !m_secret->text().trimmed().isEmpty());
 }
 
-void ConfigDialog::importQrCode() noexcept
+void ConfigDialog::parseQrCode(const QByteArray& data) noexcept
 {
-    QString filename = QFileDialog::getOpenFileName(this);
-    if (filename.isEmpty())
-        return;
-
     QRDecoder decoder;
-    QByteArrayList infos = decoder.decode(QImage{filename});
+    QImage image;
+    image.loadFromData(data);
+    QByteArrayList infos = decoder.decode(image);
     QByteArrayListIterator iter{infos};
     while (iter.hasNext())
     {
@@ -127,7 +125,7 @@ void ConfigDialog::importQrCode() noexcept
 
             if (query.hasQueryItem(Config::ALGORITHM))
             {
-                m_algorithm->setCurrentText(query.queryItemValue(Config::ALGORITHM));
+                m_algorithm->setCurrentText(query.queryItemValue(Config::ALGORITHM).toUpper());
             }
             else
             {
@@ -143,6 +141,17 @@ void ConfigDialog::importQrCode() noexcept
     }
 
     QMessageBox::warning(this, tr("Import by QR-Code Failed"), tr("Cannot find QR-Code of TOTP message"));
+}
+
+void ConfigDialog::importQrCode() noexcept
+{
+    QFileDialog::getOpenFileContent(
+        "*", 
+        [this](const QString& filename, const QByteArray& data){
+            if (!filename.isEmpty())
+                parseQrCode(data);
+        }
+    );
 }
 
 void ConfigDialog::saveConfig() noexcept

@@ -25,6 +25,7 @@ public:
 public slots:
     void refreshOkButton() noexcept;
     void importQrCode() noexcept;
+    void parseQrCode(const QByteArray& data) noexcept;
     void saveConfig() noexcept;
 
 private:

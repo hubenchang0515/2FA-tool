@@ -3,18 +3,33 @@
 namespace TowFATool
 {
 
-const QString Config::SCHEMA = "otpauth";
-const QString Config::HOST = "totp";
-const QString Config::SECRET = "secret";
-const QString Config::DIGITS = "digits";
-const QString Config::PERIOD = "period";
+const QString Config::SCHEMA    = "otpauth";
+const QString Config::HOST      = "totp";
+const QString Config::SECRET    = "secret";
+const QString Config::DIGITS    = "digits";
+const QString Config::PERIOD    = "period";
 const QString Config::ALGORITHM = "algorithm";
+
+const QStringList Config::ALGORITHM_LIST = {
+    "MD5", "SHA1", 
+    "SHA224", "SHA256", "SHA384", "SHA512",
+    "SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512",
+};
 
 const QMap<QString, QCryptographicHash::Algorithm> Config::ALGORITHM_MAP = 
 {
+    {"MD5", QCryptographicHash::Md5},
     {"SHA1", QCryptographicHash::Sha1},
+
+    {"SHA224", QCryptographicHash::Sha224},
     {"SHA256", QCryptographicHash::Sha256},
+    {"SHA384", QCryptographicHash::Sha384},
     {"SHA512", QCryptographicHash::Sha512},
+
+    {"SHA3-224", QCryptographicHash::Sha3_224},
+    {"SHA3-256", QCryptographicHash::Sha3_256},
+    {"SHA3-384", QCryptographicHash::Sha3_384},
+    {"SHA3-512", QCryptographicHash::Sha3_512},
 };
 
 

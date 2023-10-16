@@ -17,6 +17,7 @@ public:
     static const QString DIGITS;
     static const QString PERIOD;
     static const QString ALGORITHM;
+    static const QStringList ALGORITHM_LIST;
     static const QMap<QString, QCryptographicHash::Algorithm> ALGORITHM_MAP;
     
     Config(const QString& filename, QObject* parent=nullptr) noexcept;
