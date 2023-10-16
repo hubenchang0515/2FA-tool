@@ -92,20 +92,19 @@ QByteArray Totp::decodeBase32(const QString& key) const noexcept
     // static const char* _base32Map = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
     QByteArray data;
 
-    const char* code = key.toLatin1();
     quint64 bits40 = 0;
     int count = 0;
     for (int i = 0; i < key.size(); i++)
     {
-        char ch = code[i];
+        QChar ch = key[i];
         count += 1;
         if (ch >= 'A' && ch <= 'Z')
         {
-            bits40 |= (quint64)(ch - 'A') << (40 - count*5);
+            bits40 |= (quint64)(ch.unicode() - 'A') << (40 - count*5);
         }
         else if (ch >= '2' && ch <= '7')
         {
-            bits40 |= (quint64)(ch - '2' + 26) << (40 - count*5);
+            bits40 |= (quint64)(ch.unicode() - '2' + 26) << (40 - count*5);
         }
 
         if (count == 8 || i == key.size() - 1)
