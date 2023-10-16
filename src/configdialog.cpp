@@ -166,7 +166,7 @@ void ConfigDialog::parseQrCode(const QByteArray& data) noexcept
 void ConfigDialog::importQrCode() noexcept
 {
     QFileDialog::getOpenFileContent(
-        "*", 
+        "", 
         [this](const QString& filename, const QByteArray& data){
             enableConfig(false);
             m_importButton->setText(tr("Be Parsing..."));
