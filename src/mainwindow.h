@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QListWidget>
+#include <QProgressBar>
 #include <QLCDNumber>
 #include <QTimer>
 
@@ -26,6 +27,8 @@ public:
 public slots:
     void showConfigDialog() const noexcept;
     void refreshList() const noexcept;
+    void refreshAccount() const noexcept;
+    void refreshProgress() const noexcept;
     void refreshPassword() const noexcept;
     void copyPassword() const noexcept;
 
@@ -39,6 +42,7 @@ private:
     QLabel*         m_site;
     QLabel*         m_user;
     QPushButton*    m_copy;
+    QProgressBar*   m_progress;
     QLCDNumber*     m_password;
 
     Config*         m_config;

@@ -2,6 +2,7 @@
 
 #include <QGuiApplication>
 #include <QClipboard>
+#include <QDateTime>
 
 #include "totp.h"
 
@@ -19,6 +20,7 @@ MainWindow::MainWindow(QWidget* parent) noexcept:
     m_site{new QLabel{"", this}},
     m_user{new QLabel{"", this}},
     m_copy{new QPushButton{"Copy Password", this}},
+    m_progress{new QProgressBar{this}},
     m_password{new QLCDNumber{6, this}},
     m_config{new Config{QCoreApplication::applicationDirPath() + "/2fa.ini", this}},
     m_configDialog{new ConfigDialog{m_config, this}},
@@ -30,6 +32,7 @@ MainWindow::MainWindow(QWidget* parent) noexcept:
     m_rightLayout->addWidget(m_site);
     m_rightLayout->addWidget(m_user);
     m_rightLayout->addWidget(m_copy);
+    m_rightLayout->addWidget(m_progress);
     m_rightLayout->addWidget(m_password);
 
     m_mainLayout->addLayout(m_leftLayout);
@@ -40,6 +43,7 @@ MainWindow::MainWindow(QWidget* parent) noexcept:
 
     m_accountList->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     m_addAccountButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    m_progress->setFormat("%v");
     m_password->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     m_password->setSegmentStyle(QLCDNumber::Filled);
@@ -50,14 +54,17 @@ MainWindow::MainWindow(QWidget* parent) noexcept:
     m_timer->start();
 
     refreshList();
+    refreshProgress();
     refreshPassword();
     copyPassword();
 
     connect(m_addAccountButton, &QPushButton::clicked, this, &MainWindow::showConfigDialog);
     connect(m_config, &Config::changed, this, &MainWindow::refreshList);
+    connect(m_accountList, &QListWidget::currentRowChanged, this, &MainWindow::refreshProgress);
     connect(m_accountList, &QListWidget::currentRowChanged, this, &MainWindow::refreshPassword);
     connect(m_accountList, &QListWidget::currentRowChanged, this, &MainWindow::copyPassword);
     connect(m_copy, &QPushButton::clicked, this, &MainWindow::copyPassword);
+    connect(m_timer, &QTimer::timeout, this, &MainWindow::refreshProgress);
     connect(m_timer, &QTimer::timeout, this, &MainWindow::refreshPassword);
 }
 
@@ -69,24 +76,13 @@ MainWindow::~MainWindow() noexcept
 
 
 QString MainWindow::password() const noexcept
-{
-    QListWidgetItem* item = m_accountList->currentItem();
-    if (item == nullptr)
-        return "";
-    
-    QStringList path = item->text().remove("/").split(":");
-    if (path.size() < 2)
-        return "";
-
-    m_site->setText(path[0]);
-    m_user->setText(path[1]);
-    
-    quint16 digits = m_config->digits(path[0], path[1]);
-    quint16 period = m_config->period(path[0], path[1]);
-    QCryptographicHash::Algorithm algorithm = Config::ALGORITHM_MAP[m_config->algorithm(path[0], path[1])];
+{   
+    quint16 digits = m_config->digits(m_site->text(), m_user->text());
+    quint16 period = m_config->period(m_site->text(), m_user->text());
+    QCryptographicHash::Algorithm algorithm = Config::ALGORITHM_MAP[m_config->algorithm(m_site->text(), m_user->text())];
 
     Totp totp{algorithm, 0, period, digits};
-    return totp.password(m_config->secret(path[0], path[1]));
+    return totp.password(m_config->secret(m_site->text(), m_user->text()));
 }
 
 
@@ -113,9 +109,36 @@ void MainWindow::refreshList() const noexcept
     }
 }
 
+void MainWindow::refreshAccount() const noexcept
+{
+    QListWidgetItem* item = m_accountList->currentItem();
+    if (item == nullptr)
+        return;
+    
+    QStringList path = item->text().remove("/").split(":");
+    if (path.size() < 2)
+        return;
+
+    m_site->setText(path[0]);
+    m_user->setText(path[1]);
+}
+
+
+void MainWindow::refreshProgress() const noexcept
+{
+    refreshAccount();
+    quint16 period = m_config->period(m_site->text(), m_user->text());
+    if (period > 0)
+    {
+        m_progress->setRange(0, period);
+        m_progress->setValue(period - (QDateTime::currentSecsSinceEpoch() % period));
+    }
+}
+
 
 void MainWindow::refreshPassword() const noexcept
 {
+    refreshAccount();
     QString password = this->password();
 
     if (password.isEmpty())
@@ -133,6 +156,7 @@ void MainWindow::refreshPassword() const noexcept
 
 void MainWindow::copyPassword() const noexcept
 {
+    refreshAccount();
     QString password = this->password();
     if (!password.isEmpty())
     {

@@ -41,6 +41,8 @@ void Totp::setLength(size_t length) noexcept
 
 QString Totp::generate(const QByteArray& key, int64_t currentTime) const noexcept
 {
+    if (m_intervalTime <= 0)
+        return "";
     qint64 counter = qToBigEndian<qint64>((currentTime - m_originTime) / m_intervalTime);
     QByteArray value = hmac(key, QByteArray{reinterpret_cast<char*>(&counter), sizeof(counter)});
     return truncate(value);
