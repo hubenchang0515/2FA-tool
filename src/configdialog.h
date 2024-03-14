@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QComboBox>
+#include <QPointer>
 
 #include "config.h"
 
@@ -16,11 +17,13 @@ namespace TowFATool
 
 class ConfigDialog : public QDialog
 {
+    Q_OBJECT
 public:
-    ConfigDialog(Config* config, QWidget* parent=nullptr) noexcept;
+    ConfigDialog(QPointer<Config> config, QWidget* parent=nullptr) noexcept;
     ~ConfigDialog() noexcept;
 
     void show() noexcept;
+    void show(const QString& site, const QString& user) noexcept;
     void enableConfig(bool enabled) noexcept;
 
 public slots:
@@ -46,7 +49,7 @@ private:
     QPushButton*    m_importButton;
     QPushButton*    m_okButton;
 
-    Config*         m_config;
+    QPointer<Config>  m_config;
 };
 
 }; // namespace TowFATool

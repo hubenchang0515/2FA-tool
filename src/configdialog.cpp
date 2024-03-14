@@ -12,7 +12,7 @@
 namespace TowFATool
 {
 
-ConfigDialog::ConfigDialog(Config* config, QWidget* parent) noexcept:
+ConfigDialog::ConfigDialog(QPointer<Config> config, QWidget* parent) noexcept:
     QDialog(parent),
     m_formLayout{new QFormLayout{this}},
     m_siteLabel{new QLabel{tr("Site"), this}},
@@ -60,7 +60,7 @@ ConfigDialog::ConfigDialog(Config* config, QWidget* parent) noexcept:
 
 ConfigDialog::~ConfigDialog() noexcept
 {
-
+    
 }
 
 void ConfigDialog::show() noexcept
@@ -72,6 +72,17 @@ void ConfigDialog::show() noexcept
     m_period->setText("30");
     m_algorithm->setCurrentText("SHA1");
 
+    QDialog::show();
+}
+
+void ConfigDialog::show(const QString& site, const QString& user) noexcept
+{
+    m_site->setText(site);
+    m_user->setText(user);
+    m_secret->setText(m_config->secret(site, user));
+    m_digits->setText(QString::number(m_config->digits(site, user)));
+    m_period->setText(QString::number(m_config->period(site, user)));
+    m_algorithm->setCurrentText(m_config->algorithm(site, user));
     QDialog::show();
 }
 

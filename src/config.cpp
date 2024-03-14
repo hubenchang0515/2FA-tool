@@ -32,6 +32,12 @@ const QMap<QString, QCryptographicHash::Algorithm> Config::ALGORITHM_MAP =
     {"SHA3-512", QCryptographicHash::Sha3_512},
 };
 
+// static 
+QString Config::key(const QString& site, const QString& user) noexcept
+{
+    return QString("/%1:%2").arg(site).arg(user);
+}
+
 
 Config::Config(const QString& filename, QObject* parent) noexcept:
     QObject{parent},
@@ -42,7 +48,7 @@ Config::Config(const QString& filename, QObject* parent) noexcept:
 
 Config::~Config() noexcept
 {
-
+    
 }
 
 QStringList	Config::allKeys() const noexcept
@@ -50,9 +56,14 @@ QStringList	Config::allKeys() const noexcept
     return m_settings->childGroups();
 }
 
+void Config::remove(const QString& site, const QString& user) const noexcept
+{
+    m_settings->remove(Config::key(site, user));
+}
+
 QString Config::secret(const QString& site, const QString& user) const noexcept
 {
-    m_settings->beginGroup(QString("/%1:%2").arg(site).arg(user));
+    m_settings->beginGroup(Config::key(site, user));
     QString value = m_settings->value(Config::SECRET).toString();
     m_settings->endGroup();
     return value;
@@ -60,14 +71,14 @@ QString Config::secret(const QString& site, const QString& user) const noexcept
 
 void Config::setSecret(const QString& site, const QString& user, const QString& secret) const noexcept
 {
-    m_settings->beginGroup(QString("/%1:%2").arg(site).arg(user));
+    m_settings->beginGroup(Config::key(site, user));
     m_settings->setValue(Config::SECRET, QVariant{secret});
     m_settings->endGroup();
 }
 
 quint16 Config::digits(const QString& site, const QString& user) const noexcept
 {
-    m_settings->beginGroup(QString("/%1:%2").arg(site).arg(user));
+    m_settings->beginGroup(Config::key(site, user));
     quint16 value = m_settings->value(Config::DIGITS).toUInt();
     m_settings->endGroup();
     return value;
@@ -75,14 +86,14 @@ quint16 Config::digits(const QString& site, const QString& user) const noexcept
 
 void Config::setDigits(const QString& site, const QString& user, quint16 digits) const noexcept
 {
-    m_settings->beginGroup(QString("/%1:%2").arg(site).arg(user));
+    m_settings->beginGroup(Config::key(site, user));
     m_settings->setValue(Config::DIGITS, QVariant{digits});
     m_settings->endGroup();
 }
 
 quint16 Config::period(const QString& site, const QString& user) const noexcept
 {
-    m_settings->beginGroup(QString("/%1:%2").arg(site).arg(user));
+    m_settings->beginGroup(Config::key(site, user));
     quint16 value = m_settings->value(Config::PERIOD).toUInt();
     m_settings->endGroup();
     return value;
@@ -90,14 +101,14 @@ quint16 Config::period(const QString& site, const QString& user) const noexcept
 
 void Config::setPeriod(const QString& site, const QString& user, quint16 period) const noexcept
 {
-    m_settings->beginGroup(QString("/%1:%2").arg(site).arg(user));
+    m_settings->beginGroup(Config::key(site, user));
     m_settings->setValue(Config::PERIOD, QVariant{period});
     m_settings->endGroup();
 }
 
 QString Config::algorithm(const QString& site, const QString& user) const noexcept
 {
-    m_settings->beginGroup(QString("/%1:%2").arg(site).arg(user));
+    m_settings->beginGroup(Config::key(site, user));
     QString value = m_settings->value(Config::ALGORITHM).toString().toUpper();
     m_settings->endGroup();
     
@@ -109,7 +120,7 @@ QString Config::algorithm(const QString& site, const QString& user) const noexce
 
 void Config::setAlgorithm(const QString& site, const QString& user, const QString& algorithm) const noexcept
 {
-    m_settings->beginGroup(QString("/%1:%2").arg(site).arg(user));
+    m_settings->beginGroup(Config::key(site, user));
     m_settings->setValue(Config::ALGORITHM, QVariant{algorithm});
     m_settings->endGroup();
 }

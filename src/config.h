@@ -19,11 +19,14 @@ public:
     static const QString ALGORITHM;
     static const QStringList ALGORITHM_LIST;
     static const QMap<QString, QCryptographicHash::Algorithm> ALGORITHM_MAP;
+
+    static QString key(const QString& site, const QString& user) noexcept;
     
     Config(const QString& filename, QObject* parent=nullptr) noexcept;
     ~Config() noexcept;
 
     QStringList	allKeys() const noexcept;
+    void remove(const QString& site, const QString& user) const noexcept;
 
     QString secret(const QString& site, const QString& user) const noexcept;
     void setSecret(const QString& site, const QString& user, const QString& secret) const noexcept;

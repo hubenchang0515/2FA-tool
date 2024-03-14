@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 
-#include <QGuiApplication>
+#include <QApplication>
 #include <QClipboard>
 #include <QDateTime>
 
@@ -11,23 +11,30 @@ namespace TowFATool
 
 MainWindow::MainWindow(QWidget* parent) noexcept:
     QMainWindow{parent},
-    m_mainLayout{new QHBoxLayout{this}},
-    m_leftLayout{new QVBoxLayout{this}},
-    m_rightLayout{new QVBoxLayout{this}},
+    m_mainLayout{new QHBoxLayout{nullptr}},
+    m_leftLayout{new QVBoxLayout{nullptr}},
+    m_rightLayout{new QVBoxLayout{nullptr}},
+    m_buttonLayout{new QHBoxLayout{nullptr}},
     m_centralWidget{new QWidget{this}},
     m_accountList{new QListWidget{this}},
-    m_addAccountButton{new QPushButton{tr("Add"), this}},
+    m_addAccountButton{new QPushButton{qApp->style()->standardIcon(QStyle::SP_FileDialogNewFolder), tr("Add"), this}},
+    m_editAccountButton{new QPushButton{qApp->style()->standardIcon(QStyle::SP_DialogOpenButton), tr("Edit"), this}},
+    m_delAccountButton{new QPushButton{qApp->style()->standardIcon(QStyle::SP_DialogCloseButton), tr("Delete"), this}},
     m_site{new QLabel{"", this}},
     m_user{new QLabel{"", this}},
-    m_copy{new QPushButton{"Copy Password", this}},
+    m_copy{new QPushButton{tr("Copy Password"), this}},
     m_progress{new QProgressBar{this}},
     m_password{new QLCDNumber{6, this}},
     m_config{new Config{QCoreApplication::applicationDirPath() + "/2fa.ini", this}},
     m_configDialog{new ConfigDialog{m_config, this}},
     m_timer{new QTimer{this}}
 {
+    m_buttonLayout->addWidget(m_addAccountButton);
+    m_buttonLayout->addWidget(m_editAccountButton);
+    m_buttonLayout->addWidget(m_delAccountButton);
+
     m_leftLayout->addWidget(m_accountList);
-    m_leftLayout->addWidget(m_addAccountButton);
+    m_leftLayout->addLayout(m_buttonLayout);
 
     m_rightLayout->addWidget(m_site);
     m_rightLayout->addWidget(m_user);
@@ -58,7 +65,9 @@ MainWindow::MainWindow(QWidget* parent) noexcept:
     refreshPassword();
     copyPassword();
 
-    connect(m_addAccountButton, &QPushButton::clicked, this, &MainWindow::showConfigDialog);
+    connect(m_addAccountButton, &QPushButton::clicked, this, &MainWindow::addConfig);
+    connect(m_editAccountButton, &QPushButton::clicked, this, &MainWindow::editConfig);
+    connect(m_delAccountButton, &QPushButton::clicked, this, &MainWindow::delConfig);
     connect(m_config, &Config::changed, this, &MainWindow::refreshList);
     connect(m_accountList, &QListWidget::currentRowChanged, this, &MainWindow::refreshProgress);
     connect(m_accountList, &QListWidget::currentRowChanged, this, &MainWindow::refreshPassword);
@@ -86,9 +95,20 @@ QString MainWindow::password() const noexcept
 }
 
 
-void MainWindow::showConfigDialog() const noexcept
+void MainWindow::addConfig() const noexcept
 {
     m_configDialog->show();
+}
+
+void MainWindow::editConfig() const noexcept
+{
+    m_configDialog->show(m_site->text(), m_user->text());
+}
+
+void MainWindow::delConfig() const noexcept
+{
+    m_config->remove(m_site->text(), m_user->text());
+    refreshList();
 }
 
 
