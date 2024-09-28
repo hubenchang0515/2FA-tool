@@ -32,6 +32,9 @@ MainWindow::MainWindow(QWidget* parent) noexcept:
     m_buttonLayout->addWidget(m_addAccountButton);
     m_buttonLayout->addWidget(m_editAccountButton);
     m_buttonLayout->addWidget(m_delAccountButton);
+    m_buttonLayout->setStretch(0, 1);
+    m_buttonLayout->setStretch(1, 1);
+    m_buttonLayout->setStretch(2, 1);
 
     m_leftLayout->addWidget(m_accountList);
     m_leftLayout->addLayout(m_buttonLayout);

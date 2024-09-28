@@ -14,7 +14,7 @@ namespace TowFATool
 
 ConfigDialog::ConfigDialog(QPointer<Config> config, QWidget* parent) noexcept:
     QDialog(parent),
-    m_formLayout{new QFormLayout{this}},
+    m_formLayout{new QGridLayout{this}},
     m_siteLabel{new QLabel{tr("Site"), this}},
     m_site{new QLineEdit{this}},
     m_userLabel{new QLabel{tr("User"), this}},
@@ -31,14 +31,20 @@ ConfigDialog::ConfigDialog(QPointer<Config> config, QWidget* parent) noexcept:
     m_okButton{new QPushButton{tr("OK"), this}},
     m_config{config}
 {
-    m_formLayout->addRow(m_siteLabel, m_site);
-    m_formLayout->addRow(m_userLabel, m_user);
-    m_formLayout->addRow(m_secretLabel, m_secret);
-    m_formLayout->addRow(m_digitsLabel, m_digits);
-    m_formLayout->addRow(m_periodLabel, m_period);
-    m_formLayout->addRow(m_algorithmLabel, m_algorithm);
-    m_formLayout->addRow(m_importButton);
-    m_formLayout->addRow(m_okButton);
+    m_formLayout->addWidget(m_siteLabel, 0, 0);
+    m_formLayout->addWidget(m_site, 0, 1);
+    m_formLayout->addWidget(m_userLabel, 1, 0);
+    m_formLayout->addWidget(m_user, 1, 1);
+    m_formLayout->addWidget(m_secretLabel, 2, 0);
+    m_formLayout->addWidget(m_secret, 2, 1);
+    m_formLayout->addWidget(m_digitsLabel, 3, 0);
+    m_formLayout->addWidget(m_digits, 3, 1);
+    m_formLayout->addWidget(m_periodLabel, 4, 0);
+    m_formLayout->addWidget(m_period, 4, 1);
+    m_formLayout->addWidget(m_algorithmLabel, 5, 0);
+    m_formLayout->addWidget(m_algorithm, 5, 1);
+    m_formLayout->addWidget(m_importButton, 6, 0, 1, 2);
+    m_formLayout->addWidget(m_okButton, 7, 0, 1, 2);
     setLayout(m_formLayout);
 
     m_algorithm->addItems(Config::ALGORITHM_LIST);
@@ -72,6 +78,7 @@ void ConfigDialog::show() noexcept
     m_period->setText("30");
     m_algorithm->setCurrentText("SHA1");
 
+    adjustSize();
     QDialog::show();
 }
 
@@ -176,19 +183,18 @@ void ConfigDialog::parseQrCode(const QByteArray& data) noexcept
 
 void ConfigDialog::importQrCode() noexcept
 {
-    QFileDialog::getOpenFileContent(
-        "", 
-        [this](const QString& filename, const QByteArray& data){
-            enableConfig(false);
-            m_importButton->setText(tr("Be Parsing..."));
-            if (!filename.isEmpty())
-            {
-                parseQrCode(data);
-            }
-            enableConfig(true);
-            m_importButton->setText(tr("Import By QR-Code"));
+    auto callback = [this](const QString& filename, const QByteArray& data) {
+        enableConfig(false);
+        m_importButton->setText(tr("Be Parsing..."));
+        if (!filename.isEmpty())
+        {
+            parseQrCode(data);
         }
-    );
+        enableConfig(true);
+        m_importButton->setText(tr("Import By QR-Code"));
+    };
+
+    QFileDialog::getOpenFileContent("", callback);
 }
 
 void ConfigDialog::saveConfig() noexcept

@@ -3,7 +3,6 @@
 
 #include <QDialog>
 #include <QLayout>
-#include <QFormLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
@@ -33,7 +32,7 @@ public slots:
     void saveConfig() noexcept;
 
 private:
-    QFormLayout*    m_formLayout;
+    QGridLayout*    m_formLayout;
     QLabel*         m_siteLabel;
     QLineEdit*      m_site;
     QLabel*         m_userLabel;
