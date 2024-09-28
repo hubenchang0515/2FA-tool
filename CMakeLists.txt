@@ -1,21 +1,11 @@
 cmake_minimum_required(VERSION 3.2)
 project(2FA-tool)
 
-find_package(
-  Qt6
-  COMPONENTS 
-  Core
-  Widgets
-)
+find_package(Qt6 COMPONENTS Core Widgets QUIET)
 
 if (NOT Qt6_FOUND)
-  find_package(
-    Qt5
-    COMPONENTS 
-    Core
-    Widgets
-    REQUIRED)
-endif(NOT Qt6_FOUND)
+  find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
+endif (NOT Qt6_FOUND)
 
 SET(CMAKE_AUTOMOC ON)
 SET(CMAKE_AUTORCC ON)
