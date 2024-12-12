@@ -17,9 +17,9 @@ add_subdirectory(3rdparty EXCLUDE_FROM_ALL)
 aux_source_directory(src SOURCE)
 
 if (NOT Qt6_FOUND)
-  add_executable(${PROJECT_NAME} ${SOURCE})
+  add_executable(${PROJECT_NAME} ${SOURCE} src/QtTheme/QtTheme_Flat_Dark_LightBlue_Indigo.qrc)
 else()
-  qt_add_executable(${PROJECT_NAME} ${SOURCE})
+  qt_add_executable(${PROJECT_NAME} ${SOURCE} src/QtTheme/QtTheme_Flat_Dark_LightBlue_Indigo.qrc)
 endif(NOT Qt6_FOUND)
 
 target_include_directories(${PROJECT_NAME} PRIVATE quirc)

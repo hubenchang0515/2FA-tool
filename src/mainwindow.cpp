@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QDateTime>
+#include <QFile>
 
 #include "totp.h"
 
@@ -78,6 +79,14 @@ MainWindow::MainWindow(QWidget* parent) noexcept:
     connect(m_copy, &QPushButton::clicked, this, &MainWindow::copyPassword);
     connect(m_timer, &QTimer::timeout, this, &MainWindow::refreshProgress);
     connect(m_timer, &QTimer::timeout, this, &MainWindow::refreshPassword);
+
+    QFile qss(":/QtTheme/QtTheme_Flat_Dark_LightBlue_Indigo.qss");
+    qss.open(QFile::ReadOnly);
+    setStyleSheet(qss.readAll());
+
+    m_delAccountButton->setProperty("Color", "Danger");
+    m_copy->setProperty("Color", "Primary");
+    m_accountList->setProperty("Color", "Primary");
 }
 
 
@@ -158,11 +167,29 @@ void MainWindow::refreshAccount() const noexcept
 void MainWindow::refreshProgress() const noexcept
 {
     refreshAccount();
-    quint16 period = m_config->period(m_site->text(), m_user->text());
+    quint64 period = m_config->period(m_site->text(), m_user->text());
     if (period > 0)
     {
+        int time = period - (QDateTime::currentSecsSinceEpoch() % period);
         m_progress->setRange(0, period);
-        m_progress->setValue(period - (QDateTime::currentSecsSinceEpoch() % period));
+        m_progress->setValue(time);
+
+        if (time > period / 2)
+        {
+            m_progress->setProperty("Color", "Success");
+        }
+        else if(time > 5)
+        {
+            m_progress->setProperty("Color", "Warning");
+        }
+        else
+        {
+            m_progress->setProperty("Color", "Danger");
+        }
+
+        // update style manually
+        m_progress->style()->unpolish(m_progress);
+        m_progress->style()->polish(m_progress);
     }
 }
 
