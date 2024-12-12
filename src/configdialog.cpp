@@ -66,7 +66,9 @@ ConfigDialog::~ConfigDialog() noexcept
 void ConfigDialog::show() noexcept
 {
     m_site->setText("");
+    m_site->setReadOnly(false);
     m_user->setText("");
+    m_user->setReadOnly(false);
     m_secret->setText("");
     m_digits->setText("6");
     m_period->setText("30");
@@ -78,7 +80,9 @@ void ConfigDialog::show() noexcept
 void ConfigDialog::show(const QString& site, const QString& user) noexcept
 {
     m_site->setText(site);
+    m_site->setReadOnly(true);
     m_user->setText(user);
+    m_user->setReadOnly(true);
     m_secret->setText(m_config->secret(site, user));
     m_digits->setText(QString::number(m_config->digits(site, user)));
     m_period->setText(QString::number(m_config->period(site, user)));
